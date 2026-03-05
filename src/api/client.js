@@ -27,10 +27,10 @@ export const clearSession = () => {
 // Core fetch wrapper
 async function apiFetch(path, options = {}) {
     const token = getToken();
-    
+
     const headers = {
         'Content-Type': 'application/json',
-        ...(token ? {'Authorization': `Bearer ${token}`} : {}),
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
         ...options.headers,
     };
 
@@ -40,12 +40,11 @@ async function apiFetch(path, options = {}) {
     });
 
     // Handle 204 No Content (DELETE responses)
-    if(response.status) {
+    if (response.status === 204) {
         return null;
     }
-    
-    // Handle auth errors
 
+    // Handle auth errors
     if (response.status === 401) {
         clearSession();
         window.dispatchEvent(new CustomEvent('auth:expired'));
@@ -54,7 +53,7 @@ async function apiFetch(path, options = {}) {
 
     const body = await response.json();
 
-    if(!body.success) {
+    if (!body.success) {
         throw new ApiError(body.status, body.message, body.errors);
     }
 
@@ -99,7 +98,7 @@ export const posts = {
         apiFetch(`/posts/admin/all?page=${page}&size=${size}`),
 
     create: payload =>
-        apiFetch('/posts', {method: 'POST', body: JSON.stringify(payload) }),
+        apiFetch('/posts', { method: 'POST', body: JSON.stringify(payload) }),
 
     update: (id, payload) =>
         apiFetch(`/posts/${id}`, { method: 'PUT', body: JSON.stringify(payload) }),
