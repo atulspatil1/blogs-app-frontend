@@ -12,18 +12,18 @@ const EMPTY = {
 }
 
 export default function PostEditor() {
-  const { id }      = useParams()
-  const navigate    = useNavigate()
+  const { id } = useParams()
+  const navigate = useNavigate()
   const { isAdmin } = useAuth()
-  const isEdit      = !!id
+  const isEdit = !!id
 
-  const [form, setForm]           = useState(EMPTY)
-  const [saving, setSaving]       = useState(false)
-  const [error, setError]         = useState(null)
+  const [form, setForm] = useState(EMPTY)
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState(null)
   const [slugDirty, setSlugDirty] = useState(false)
 
   const { data: allCategories } = useAsync(() => catsApi.list())
-  const { data: allTags }       = useAsync(() => tagsApi.list())
+  const { data: allTags } = useAsync(() => tagsApi.list())
 
   // Load post for editing
   useEffect(() => {
@@ -33,19 +33,19 @@ export default function PostEditor() {
         const p = page.content.find((x) => String(x.id) === String(id))
         if (p) {
           setForm({
-            title:         p.title         || '',
-            slug:          p.slug          || '',
-            summary:       p.summary       || '',
-            content:       p.content       || '',
+            title: p.title || '',
+            slug: p.slug || '',
+            summary: p.summary || '',
+            content: p.content || '',
             coverImageUrl: p.coverImageUrl || '',
-            status:        p.status        || 'DRAFT',
-            categoryIds:   [],
-            tagIds:        [],
+            status: p.status || 'DRAFT',
+            categoryIds: [],
+            tagIds: [],
           })
           setSlugDirty(true)
         }
       })
-      .catch(() => {})
+      .catch(() => { })
   }, [id, isEdit])
 
   const set = (k) => (e) =>
@@ -84,61 +84,131 @@ export default function PostEditor() {
     return <Shell><div className="container"><p className="meta">Access restricted.</p></div></Shell>
   }
 
-  const inputStyle = {
-    display: 'block', width: '100%', marginBottom: '1.5rem',
-    padding: '0.6rem 0', border: 'none', borderBottom: '1px solid var(--border)',
-    background: 'transparent', color: 'var(--foreground)',
-    fontFamily: 'var(--font-body)', fontSize: '0.95rem', fontWeight: '300',
-    outline: 'none', transition: 'border-color 0.2s ease',
-  }
-  const focus = (e) => (e.target.style.borderBottomColor = 'var(--primary)')
-  const blur  = (e) => (e.target.style.borderBottomColor = 'var(--border)')
-
   const sectionLabel = {
-    display: 'block', fontSize: '0.75rem', fontWeight: '600',
-    letterSpacing: '0.07em', textTransform: 'uppercase',
-    color: 'var(--muted-foreground)', marginBottom: '0.75rem',
+    display: 'block', fontSize: '0.75rem', fontWeight: '700',
+    letterSpacing: '0.08em', textTransform: 'uppercase',
+    color: 'var(--text-secondary)', marginBottom: '0.75rem',
   }
 
   return (
     <Shell>
-      <div className="container">
-        <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.4rem, 3vw, 1.85rem)', fontWeight: '500', marginBottom: '0.5rem' }}>
+      <div className="container" style={{ maxWidth: '48rem', margin: '0 auto' }}>
+        <h1
+          className="animate-fade-in-up"
+          style={{
+            fontFamily: 'var(--font-heading)',
+            fontSize: 'clamp(1.4rem, 3vw, 1.85rem)',
+            fontWeight: '700',
+            fontStyle: 'italic',
+            marginBottom: '0.5rem',
+          }}
+        >
           {isEdit ? 'Edit essay' : 'New essay'}
         </h1>
 
-        <hr style={{ margin: '1.5rem 0 2.5rem' }} />
+        <hr style={{ margin: '1.5rem 0 2rem' }} />
 
-        <form onSubmit={handleSubmit}>
+        <form
+          onSubmit={handleSubmit}
+          className="animate-fade-in-up delay-1"
+          style={{
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-light)',
+            borderRadius: 'var(--radius-xl)',
+            padding: 'clamp(1.25rem, 3vw, 2rem)',
+            boxShadow: 'var(--shadow-sm)',
+          }}
+        >
           {/* Title */}
-          <input type="text" placeholder="Title" value={form.title} onChange={set('title')} required style={{ ...inputStyle, fontSize: '1.15rem' }} onFocus={focus} onBlur={blur} />
+          <div style={{ marginBottom: '1.25rem' }}>
+            <label style={{ ...sectionLabel }}>Title</label>
+            <input
+              type="text"
+              placeholder="Your essay title"
+              value={form.title}
+              onChange={set('title')}
+              required
+              style={{ fontSize: '1.1rem', fontWeight: '600' }}
+            />
+          </div>
 
           {/* Slug */}
-          <div style={{ position: 'relative' }}>
-            <span style={{ position: 'absolute', left: 0, top: '0.6rem', fontSize: '0.875rem', color: 'var(--muted-foreground)' }}>
-              /essays/
-            </span>
-            <input type="text" placeholder="slug" value={form.slug} onChange={setSlugField} required style={{ ...inputStyle, paddingLeft: '4rem' }} onFocus={focus} onBlur={blur} />
+          <div style={{ marginBottom: '1.25rem' }}>
+            <label style={{ ...sectionLabel }}>Slug</label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <span style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', fontWeight: '500', whiteSpace: 'nowrap' }}>
+                /essays/
+              </span>
+              <input type="text" placeholder="slug" value={form.slug} onChange={setSlugField} required />
+            </div>
           </div>
 
           {/* Summary */}
-          <textarea placeholder="Summary (2–3 sentence intro)" value={form.summary} onChange={set('summary')} rows={3} style={{ ...inputStyle, resize: 'vertical' }} onFocus={focus} onBlur={blur} />
+          <div style={{ marginBottom: '1.25rem' }}>
+            <label style={{ ...sectionLabel }}>Summary</label>
+            <textarea
+              placeholder="2–3 sentence intro"
+              value={form.summary}
+              onChange={set('summary')}
+              rows={3}
+              style={{ resize: 'vertical' }}
+            />
+          </div>
 
           {/* Content */}
-          <textarea placeholder="Essay content (Markdown supported)" value={form.content} onChange={set('content')} rows={18} style={{ ...inputStyle, resize: 'vertical', minHeight: '24rem', fontFamily: 'monospace', fontSize: '0.875rem' }} onFocus={focus} onBlur={blur} />
+          <div style={{ marginBottom: '1.25rem' }}>
+            <label style={{ ...sectionLabel }}>Content</label>
+            <textarea
+              placeholder="Essay content (Markdown supported)"
+              value={form.content}
+              onChange={set('content')}
+              rows={18}
+              style={{
+                resize: 'vertical',
+                minHeight: '20rem',
+                fontFamily: "'Fira Code', monospace",
+                fontSize: '0.88rem',
+                lineHeight: '1.6',
+              }}
+            />
+          </div>
 
           {/* Cover image */}
-          <input type="text" placeholder="Cover image URL (optional)" value={form.coverImageUrl} onChange={set('coverImageUrl')} style={inputStyle} onFocus={focus} onBlur={blur} />
+          <div style={{ marginBottom: '1.25rem' }}>
+            <label style={{ ...sectionLabel }}>Cover image</label>
+            <input
+              type="text"
+              placeholder="Cover image URL (optional)"
+              value={form.coverImageUrl}
+              onChange={set('coverImageUrl')}
+            />
+          </div>
 
           {/* Status */}
           <div style={{ marginBottom: '1.5rem' }}>
             <span style={sectionLabel}>Status</span>
-            <div style={{ display: 'flex', gap: '1.5rem' }}>
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
               {['DRAFT', 'PUBLISHED'].map((s) => (
-                <label key={s} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer', fontSize: '0.9rem' }}>
-                  <input type="radio" name="status" value={s} checked={form.status === s} onChange={set('status')} style={{ accentColor: 'var(--primary)' }} />
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => setForm((f) => ({ ...f, status: s }))}
+                  style={{
+                    padding: '0.45rem 1rem',
+                    borderRadius: 'var(--radius-full)',
+                    fontSize: '0.85rem',
+                    fontWeight: '600',
+                    fontFamily: 'var(--font-body)',
+                    border: '1.5px solid',
+                    borderColor: form.status === s ? 'var(--accent)' : 'var(--border)',
+                    background: form.status === s ? 'var(--accent-glow)' : 'transparent',
+                    color: form.status === s ? 'var(--accent)' : 'var(--text-secondary)',
+                    cursor: 'pointer',
+                    transition: 'all var(--transition-fast)',
+                  }}
+                >
                   {s.charAt(0) + s.slice(1).toLowerCase()}
-                </label>
+                </button>
               ))}
             </div>
           </div>
@@ -147,12 +217,28 @@ export default function PostEditor() {
           {allCategories?.length > 0 && (
             <div style={{ marginBottom: '1.5rem' }}>
               <span style={sectionLabel}>Categories</span>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                 {allCategories.map((c) => (
-                  <label key={c.id} style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', cursor: 'pointer', fontSize: '0.875rem' }}>
-                    <input type="checkbox" checked={form.categoryIds.includes(c.id)} onChange={() => toggleId('categoryIds', c.id)} style={{ accentColor: 'var(--primary)' }} />
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => toggleId('categoryIds', c.id)}
+                    style={{
+                      padding: '0.35rem 0.85rem',
+                      borderRadius: 'var(--radius-full)',
+                      fontSize: '0.82rem',
+                      fontWeight: '600',
+                      fontFamily: 'var(--font-body)',
+                      border: '1.5px solid',
+                      borderColor: form.categoryIds.includes(c.id) ? 'var(--accent)' : 'var(--border)',
+                      background: form.categoryIds.includes(c.id) ? 'var(--accent-glow)' : 'transparent',
+                      color: form.categoryIds.includes(c.id) ? 'var(--accent)' : 'var(--text-secondary)',
+                      cursor: 'pointer',
+                      transition: 'all var(--transition-fast)',
+                    }}
+                  >
                     {c.name}
-                  </label>
+                  </button>
                 ))}
               </div>
             </div>
@@ -160,43 +246,63 @@ export default function PostEditor() {
 
           {/* Tags */}
           {allTags?.length > 0 && (
-            <div style={{ marginBottom: '2rem' }}>
+            <div style={{ marginBottom: '1.5rem' }}>
               <span style={sectionLabel}>Tags</span>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                 {allTags.map((t) => (
-                  <label key={t.id} style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', cursor: 'pointer', fontSize: '0.875rem' }}>
-                    <input type="checkbox" checked={form.tagIds.includes(t.id)} onChange={() => toggleId('tagIds', t.id)} style={{ accentColor: 'var(--primary)' }} />
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => toggleId('tagIds', t.id)}
+                    style={{
+                      padding: '0.35rem 0.85rem',
+                      borderRadius: 'var(--radius-full)',
+                      fontSize: '0.82rem',
+                      fontWeight: '600',
+                      fontFamily: 'var(--font-body)',
+                      border: '1.5px solid',
+                      borderColor: form.tagIds.includes(t.id) ? 'var(--accent-warm)' : 'var(--border)',
+                      background: form.tagIds.includes(t.id) ? 'var(--accent-warm-glow)' : 'transparent',
+                      color: form.tagIds.includes(t.id) ? 'var(--accent-warm)' : 'var(--text-secondary)',
+                      cursor: 'pointer',
+                      transition: 'all var(--transition-fast)',
+                    }}
+                  >
                     {t.name}
-                  </label>
+                  </button>
                 ))}
               </div>
             </div>
           )}
 
           {error && (
-            <p style={{ color: 'var(--primary)', fontSize: '0.875rem', marginBottom: '1rem' }}>{error}</p>
+            <div style={{
+              padding: '0.75rem 1rem',
+              background: 'rgba(217, 79, 79, 0.08)',
+              borderRadius: 'var(--radius-md)',
+              marginBottom: '1rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+            }}>
+              <span className="material-symbols-rounded" style={{ color: 'var(--error)', fontSize: '1.1rem' }}>error</span>
+              <p style={{ color: 'var(--error)', fontSize: '0.85rem', margin: 0 }}>{error}</p>
+            </div>
           )}
 
-          <div style={{ display: 'flex', gap: '1rem' }}>
+          <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem' }}>
             <button
               type="submit"
               disabled={saving}
-              style={{
-                background: 'none', border: '1px solid var(--border)',
-                color: 'var(--foreground)', padding: '0.55rem 1.5rem',
-                fontFamily: 'var(--font-body)', fontSize: '0.875rem',
-                cursor: saving ? 'default' : 'pointer',
-                opacity: saving ? 0.6 : 1, transition: 'all 0.2s ease', letterSpacing: '0.03em',
-              }}
-              onMouseEnter={(e) => { if (!saving) { e.target.style.borderColor = 'var(--primary)'; e.target.style.color = 'var(--primary)' }}}
-              onMouseLeave={(e) => { e.target.style.borderColor = 'var(--border)'; e.target.style.color = 'var(--foreground)' }}
+              className="btn btn-primary"
+              style={{ opacity: saving ? 0.7 : 1 }}
             >
-              {saving ? 'Saving…' : isEdit ? 'Save changes' : 'Publish'}
+              {saving ? 'Saving…' : isEdit ? 'Save changes' : 'Publish essay'}
             </button>
             <button
               type="button"
               onClick={() => navigate('/admin')}
-              style={{ background: 'none', border: 'none', color: 'var(--muted-foreground)', fontFamily: 'var(--font-body)', fontSize: '0.875rem', cursor: 'pointer', padding: '0' }}
+              className="btn btn-ghost"
             >
               Cancel
             </button>
