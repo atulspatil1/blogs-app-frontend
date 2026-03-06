@@ -1,14 +1,14 @@
 import { useState, useCallback } from 'react'
 import { Shell } from '../components/Layout'
-import { ArchiveList, ErrorMessage, Pagination } from '../components/PostCard'
+import { PostCard, ErrorMessage, Pagination } from '../components/PostCard'
 import { posts } from '../api/client'
 
 export default function Search() {
-  const [query, setQuery]     = useState('')
+  const [query, setQuery] = useState('')
   const [results, setResults] = useState(null)
   const [loading, setLoading] = useState(false)
-  const [error, setError]     = useState(null)
-  const [page, setPage]       = useState(0)
+  const [error, setError] = useState(null)
+  const [page, setPage] = useState(0)
 
   const doSearch = useCallback(async (q, p = 0) => {
     if (!q.trim()) return
@@ -26,27 +26,46 @@ export default function Search() {
   }, [])
 
   const handleSubmit = (e) => { e.preventDefault(); doSearch(query, 0) }
-  const goToPage     = (p) => doSearch(query, p)
-
-  const focusBorder = (e) => (e.target.style.borderBottomColor = 'var(--primary)')
-  const blurBorder  = (e) => (e.target.style.borderBottomColor = 'var(--border)')
+  const goToPage = (p) => doSearch(query, p)
 
   return (
     <Shell>
       <div className="container">
-        <h1
-          style={{
-            fontFamily:   'var(--font-heading)',
-            fontSize:     'clamp(1.5rem, 3.5vw, 2rem)',
-            fontWeight:   '500',
-            marginBottom: '2rem',
-          }}
-        >
-          Search
-        </h1>
+        {/* Header */}
+        <div style={{ textAlign: 'center', marginBottom: '2.5rem' }} className="animate-fade-in-up">
+          <h1
+            style={{
+              fontFamily: 'var(--font-heading)',
+              fontSize: 'clamp(1.8rem, 4vw, 2.5rem)',
+              fontWeight: '700',
+              fontStyle: 'italic',
+              marginBottom: '0.5rem',
+            }}
+          >
+            Search
+          </h1>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', margin: 0 }}>
+            Find essays by title, topic, or keyword.
+          </p>
+        </div>
 
-        <form onSubmit={handleSubmit} style={{ marginBottom: '3rem' }}>
-          <div style={{ display: 'flex', gap: '0.75rem' }}>
+        {/* Search form */}
+        <form onSubmit={handleSubmit} style={{ maxWidth: '36rem', margin: '0 auto 3rem' }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.75rem',
+              background: 'var(--bg-card)',
+              border: '1.5px solid var(--border)',
+              borderRadius: 'var(--radius-full)',
+              padding: '0.25rem 0.25rem 0.25rem 1.25rem',
+              transition: 'border-color var(--transition-fast), box-shadow var(--transition-fast)',
+            }}
+          >
+            <span className="material-symbols-rounded" style={{ color: 'var(--text-secondary)', fontSize: '1.2rem' }}>
+              search
+            </span>
             <input
               type="search"
               placeholder="Search essays…"
@@ -54,26 +73,29 @@ export default function Search() {
               onChange={(e) => setQuery(e.target.value)}
               autoFocus
               style={{
-                flex: 1, padding: '0.7rem 0', border: 'none',
-                borderBottom: '1px solid var(--border)', background: 'transparent',
-                color: 'var(--foreground)', fontFamily: 'var(--font-body)',
-                fontSize: '1.1rem', fontWeight: '300', outline: 'none',
-                transition: 'border-color 0.2s ease',
+                flex: 1,
+                padding: '0.6rem 0',
+                border: 'none',
+                background: 'transparent',
+                color: 'var(--text-primary)',
+                fontFamily: 'var(--font-body)',
+                fontSize: '1rem',
+                fontWeight: '400',
+                outline: 'none',
+                borderRadius: 0,
               }}
-              onFocus={focusBorder}
-              onBlur={blurBorder}
             />
             <button
               type="submit"
               disabled={loading}
+              className="btn btn-primary"
               style={{
-                background: 'none', border: 'none', padding: '0 0.25rem',
-                color: 'var(--primary)', fontFamily: 'var(--font-body)',
-                fontSize: '0.85rem', cursor: 'pointer',
-                opacity: loading ? 0.6 : 1, letterSpacing: '0.04em',
+                padding: '0.5rem 1.25rem',
+                fontSize: '0.85rem',
+                opacity: loading ? 0.7 : 1,
               }}
             >
-              {loading ? '…' : 'Search →'}
+              {loading ? '...' : 'Search'}
             </button>
           </div>
         </form>
@@ -83,23 +105,58 @@ export default function Search() {
         {results && !loading && (
           <>
             {results.totalElements > 0 ? (
-              <p style={{ color: 'var(--muted-foreground)', fontSize: '0.85rem', marginBottom: '1rem' }}>
-                {results.totalElements} result{results.totalElements !== 1 ? 's' : ''} for "{query}"
-              </p>
+              <>
+                <p style={{
+                  color: 'var(--text-secondary)',
+                  fontSize: '0.9rem',
+                  marginBottom: '1.5rem',
+                  fontWeight: '500',
+                }}>
+                  <span style={{ color: 'var(--accent)', fontWeight: '700' }}>{results.totalElements}</span>
+                  {' '}result{results.totalElements !== 1 ? 's' : ''} for "{query}"
+                </p>
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+                    gap: '1.5rem',
+                  }}
+                >
+                  {results.content.map((post, i) => (
+                    <PostCard key={post.id} post={post} index={i} />
+                  ))}
+                </div>
+                <Pagination
+                  currentPage={page}
+                  totalPages={results.totalPages}
+                  hasNext={!results.last}
+                  hasPrev={!results.first}
+                  goToPage={goToPage}
+                />
+              </>
             ) : (
-              <p style={{ color: 'var(--muted-foreground)', fontStyle: 'italic' }}>
-                No essays matched "{query}".
-              </p>
+              <div style={{ textAlign: 'center', padding: '3rem 0' }}>
+                <span className="material-symbols-rounded" style={{ fontSize: '3rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '1rem', opacity: 0.5 }}>
+                  search_off
+                </span>
+                <p style={{ color: 'var(--text-secondary)', fontStyle: 'italic', fontSize: '1.05rem' }}>
+                  No essays matched "{query}".
+                </p>
+              </div>
             )}
-            <ArchiveList posts={results.content} />
-            <Pagination
-              currentPage={page}
-              totalPages={results.totalPages}
-              hasNext={!results.last}
-              hasPrev={!results.first}
-              goToPage={goToPage}
-            />
           </>
+        )}
+
+        {/* Initial state */}
+        {!results && !loading && !error && (
+          <div style={{ textAlign: 'center', padding: '3rem 0', color: 'var(--text-secondary)' }}>
+            <span className="material-symbols-rounded" style={{ fontSize: '3rem', display: 'block', marginBottom: '0.75rem', opacity: 0.3 }}>
+              manage_search
+            </span>
+            <p style={{ fontSize: '0.95rem', fontStyle: 'italic', margin: 0 }}>
+              Start typing to discover essays.
+            </p>
+          </div>
         )}
       </div>
     </Shell>

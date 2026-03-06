@@ -4,10 +4,10 @@ import { formatDate } from '../utils'
 
 // ── Comment Form ───────────────────────────────────────
 function CommentForm({ postId }) {
-  const [form, setForm]       = useState({ authorName: '', email: '', body: '' })
+  const [form, setForm] = useState({ authorName: '', email: '', body: '' })
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
-  const [error, setError]     = useState(null)
+  const [error, setError] = useState(null)
 
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }))
 
@@ -29,27 +29,39 @@ function CommentForm({ postId }) {
 
   if (success) {
     return (
-      <p style={{ color: 'var(--muted-foreground)', fontStyle: 'italic', fontSize: '0.9rem' }}>
-        Your comment is awaiting moderation. Thank you.
-      </p>
+      <div style={{
+        padding: '1.25rem',
+        background: 'var(--accent-glow)',
+        borderRadius: 'var(--radius-md)',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.75rem'
+      }}>
+        <span className="material-symbols-rounded" style={{ color: 'var(--accent)', fontSize: '1.3rem' }}>check_circle</span>
+        <p style={{ color: 'var(--text-secondary)', fontStyle: 'italic', fontSize: '0.9rem', margin: 0 }}>
+          Your comment is awaiting moderation. Thank you.
+        </p>
+      </div>
     )
   }
 
-  const inputStyle = {
-    display: 'block', width: '100%', marginBottom: '1rem',
-    padding: '0.6rem 0', border: 'none', borderBottom: '1px solid var(--border)',
-    background: 'transparent', color: 'var(--foreground)',
-    fontFamily: 'var(--font-body)', fontSize: '0.9rem', fontWeight: '300',
-    outline: 'none', transition: 'border-color 0.2s ease',
-  }
-  const focus = (e) => (e.target.style.borderBottomColor = 'var(--primary)')
-  const blur  = (e) => (e.target.style.borderBottomColor = 'var(--border)')
-
   return (
     <form onSubmit={handleSubmit} style={{ marginTop: '1.5rem' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 1.5rem' }}>
-        <input type="text"  placeholder="Name"                value={form.authorName} onChange={set('authorName')} required style={inputStyle} onFocus={focus} onBlur={blur} />
-        <input type="email" placeholder="Email (not published)" value={form.email}    onChange={set('email')}      required style={inputStyle} onFocus={focus} onBlur={blur} />
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+        <input
+          type="text"
+          placeholder="Name"
+          value={form.authorName}
+          onChange={set('authorName')}
+          required
+        />
+        <input
+          type="email"
+          placeholder="Email (not published)"
+          value={form.email}
+          onChange={set('email')}
+          required
+        />
       </div>
       <textarea
         placeholder="Leave a response…"
@@ -57,29 +69,22 @@ function CommentForm({ postId }) {
         onChange={set('body')}
         required
         rows={4}
-        style={{ ...inputStyle, resize: 'vertical', minHeight: '6rem' }}
-        onFocus={focus}
-        onBlur={blur}
+        style={{ marginTop: '1rem', resize: 'vertical', minHeight: '6rem' }}
       />
 
       {error && (
-        <p style={{ color: 'var(--primary)', fontSize: '0.85rem', marginBottom: '0.75rem' }}>{error}</p>
+        <p style={{ color: 'var(--error)', fontSize: '0.85rem', marginTop: '0.5rem', marginBottom: '0' }}>
+          {error}
+        </p>
       )}
 
       <button
         type="submit"
         disabled={loading}
-        style={{
-          background: 'none', border: '1px solid var(--border)',
-          color: 'var(--foreground)', padding: '0.5rem 1.25rem',
-          fontFamily: 'var(--font-body)', fontSize: '0.85rem',
-          cursor: loading ? 'default' : 'pointer',
-          opacity: loading ? 0.6 : 1, transition: 'all 0.2s ease',
-        }}
-        onMouseEnter={(e) => { if (!loading) { e.target.style.borderColor = 'var(--primary)'; e.target.style.color = 'var(--primary)' }}}
-        onMouseLeave={(e) => { e.target.style.borderColor = 'var(--border)'; e.target.style.color = 'var(--foreground)' }}
+        className="btn btn-primary"
+        style={{ marginTop: '1rem', opacity: loading ? 0.7 : 1 }}
       >
-        {loading ? 'Submitting…' : 'Submit'}
+        {loading ? 'Submitting…' : 'Submit comment'}
       </button>
     </form>
   )
@@ -91,40 +96,67 @@ export function CommentSection({ postId, initialComments = [] }) {
   const approved = (initialComments || []).filter((c) => c.approved)
 
   return (
-    <section style={{ marginTop: '4rem', paddingTop: '2.5rem', borderTop: '1px solid var(--border)' }}>
+    <section style={{
+      marginTop: '3rem',
+      paddingTop: '2rem',
+      borderTop: '1px solid var(--border-light)',
+    }}>
       <button
         onClick={() => setOpen((o) => !o)}
-        style={{
-          background: 'none', border: 'none', padding: '0',
-          fontFamily: 'var(--font-body)', fontSize: '0.85rem',
-          color: 'var(--muted-foreground)', cursor: 'pointer',
-          letterSpacing: '0.03em', transition: 'color 0.2s ease',
-        }}
-        onMouseEnter={(e) => (e.target.style.color = 'var(--primary)')}
-        onMouseLeave={(e) => (e.target.style.color = 'var(--muted-foreground)')}
+        className="btn btn-ghost"
+        style={{ paddingLeft: '0', gap: '0.4rem' }}
       >
+        <span className="material-symbols-rounded" style={{ fontSize: '1.1rem' }}>
+          {open ? 'expand_less' : 'chat_bubble_outline'}
+        </span>
         {open ? 'Hide comments' : `Comments${approved.length ? ` (${approved.length})` : ''}`}
       </button>
 
       {open && (
-        <div style={{ marginTop: '2rem' }}>
+        <div style={{ marginTop: '1.5rem', animation: 'fadeInUp 0.3s ease' }}>
           {approved.length > 0 && (
-            <div style={{ marginBottom: '2.5rem' }}>
+            <div style={{ marginBottom: '2rem' }}>
               {approved.map((c) => (
-                <div key={c.id} style={{ paddingBottom: '1.5rem', marginBottom: '1.5rem', borderBottom: '1px solid var(--border)' }}>
-                  <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                    <span style={{ fontSize: '0.85rem', fontWeight: '600' }}>{c.authorName}</span>
-                    <span className="meta">{formatDate(c.createdAt)}</span>
+                <div
+                  key={c.id}
+                  style={{
+                    padding: '1.25rem',
+                    background: 'var(--bg-secondary)',
+                    borderRadius: 'var(--radius-md)',
+                    marginBottom: '0.75rem',
+                    border: '1px solid var(--border-light)',
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                    <span style={{ fontSize: '0.9rem', fontWeight: '700', color: 'var(--text-primary)' }}>
+                      {c.authorName}
+                    </span>
+                    <span className="meta" style={{ fontSize: '0.78rem' }}>{formatDate(c.createdAt)}</span>
                   </div>
-                  <p style={{ margin: 0, fontSize: '0.95rem', lineHeight: '1.65' }}>{c.body}</p>
+                  <p style={{ margin: 0, fontSize: '0.95rem', lineHeight: '1.65', color: 'var(--text-primary)' }}>
+                    {c.body}
+                  </p>
                 </div>
               ))}
             </div>
           )}
-          <div>
-            <p style={{ fontSize: '0.85rem', color: 'var(--muted-foreground)', marginBottom: '0.5rem' }}>
+
+          <div
+            style={{
+              padding: '1.5rem',
+              background: 'var(--bg-card)',
+              borderRadius: 'var(--radius-lg)',
+              border: '1px solid var(--border-light)',
+            }}
+          >
+            <h4 style={{
+              fontFamily: 'var(--font-heading)',
+              fontSize: '1rem',
+              fontWeight: '600',
+              marginBottom: '0.5rem',
+            }}>
               Leave a response
-            </p>
+            </h4>
             <CommentForm postId={postId} />
           </div>
         </div>

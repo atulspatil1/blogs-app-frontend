@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom'
 import { Shell } from '../components/Layout'
-import { ArchiveList, LoadingSkeleton, ErrorMessage, Pagination } from '../components/PostCard'
+import { PostCard, LoadingSkeleton, ErrorMessage, Pagination } from '../components/PostCard'
 import { usePaginated } from '../hooks/useApi'
 import { posts } from '../api/client'
 
@@ -20,28 +20,38 @@ export default function Category() {
   return (
     <Shell>
       <div className="container">
-        <div style={{ marginBottom: '0.5rem' }}>
-          <span className="category-label">{displayName}</span>
+        <div style={{ textAlign: 'center', marginBottom: '2.5rem' }} className="animate-fade-in-up">
+          <span className="category-label" style={{ marginBottom: '0.75rem' }}>{displayName}</span>
           <h1
             style={{
-              fontFamily:   'var(--font-heading)',
-              fontSize:     'clamp(1.5rem, 3.5vw, 2rem)',
-              fontWeight:   '500',
-              marginTop:    '0.5rem',
-              marginBottom: '0.4rem',
+              fontFamily: 'var(--font-heading)',
+              fontSize: 'clamp(1.5rem, 3.5vw, 2.25rem)',
+              fontWeight: '700',
+              fontStyle: 'italic',
+              marginTop: '0.75rem',
             }}
           >
             Essays on {displayName}
           </h1>
         </div>
 
-        <hr style={{ margin: '2rem 0' }} />
+        <hr />
 
         {loading && <LoadingSkeleton />}
-        {error   && <ErrorMessage message={error} />}
+        {error && <ErrorMessage message={error} />}
         {!loading && !error && (
           <>
-            <ArchiveList posts={content} />
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+                gap: '1.5rem',
+              }}
+            >
+              {content.map((post, i) => (
+                <PostCard key={post.id} post={post} index={i} />
+              ))}
+            </div>
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
