@@ -17,7 +17,7 @@ export function useAsync(asyncFn, deps = []) {
         } finally {
             setLoading(false);
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, deps);
 
     useEffect(() => { execute() }, [execute]);
@@ -44,7 +44,7 @@ export function usePaginated(asyncFn, deps = []) {
         } finally {
             setLoading(false);
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [...deps, size]);
 
     useEffect(() => { load(page) }, [load, page]);
@@ -56,7 +56,7 @@ export function usePaginated(asyncFn, deps = []) {
         currentPage: page, loading, error,
         goToPage: setPage,
         hasNext: data ? !data.last : false,
-        hasPrevious: data ? !data.first : false
+        hasPrev: data ? !data.first : false
     }
 }
 
