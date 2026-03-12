@@ -1,4 +1,5 @@
 import { useParams, Link } from 'react-router-dom'
+import { Helmet } from 'react-helmet-async'
 import { Shell } from '../components/Layout'
 import { ReadingProgress } from '../components/ReadingProgress'
 import { CommentSection } from '../components/Comments'
@@ -72,6 +73,12 @@ export default function PostDetail() {
     <>
       <ReadingProgress />
       <Shell>
+        {post && (
+          <Helmet>
+            <title>{post.title} — The Quiet Journal</title>
+            <meta name="description" content={post.summary || `Read "${post.title}" on The Quiet Journal.`} />
+          </Helmet>
+        )}
         <div className="container" style={{ maxWidth: '48rem', margin: '0 auto' }}>
 
           {/* ── Article header ── */}
