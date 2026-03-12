@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { Shell } from '../components/Layout';
 import { PostCard, LoadingSkeleton, ErrorMessage, Pagination } from '../components/PostCard';
 import { useAsync } from '../hooks/useApi';
@@ -282,6 +283,10 @@ export default function Home() {
 
   return (
     <Shell>
+      <Helmet>
+        <title>The Quiet Journal — Essays on Life and Craft</title>
+        <meta name="description" content="A warm archive of thoughtful essays — where reflection meets craft." />
+      </Helmet>
       {/* ── Immersive Hero ── */}
       {page === 0 && !activeCategory && (
         <HeroSection />

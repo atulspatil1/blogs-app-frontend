@@ -23,6 +23,8 @@ function PostCover({ post, height = '200px', radius = 'var(--radius-lg)' }) {
 
   return (
     <div
+      role="img"
+      aria-label={post.title ? `Cover image for ${post.title}` : 'Post cover'}
       style={{
         width: '100%',
         height,

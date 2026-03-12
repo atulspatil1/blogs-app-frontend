@@ -1,4 +1,5 @@
 import { useParams } from 'react-router-dom'
+import { Helmet } from 'react-helmet-async'
 import { Shell } from '../components/Layout'
 import { PostCard, LoadingSkeleton, ErrorMessage, Pagination } from '../components/PostCard'
 import { usePaginated } from '../hooks/useApi'
@@ -19,6 +20,10 @@ export default function Category() {
 
   return (
     <Shell>
+      <Helmet>
+        <title>{displayName} Essays — The Quiet Journal</title>
+        <meta name="description" content={`Browse our latest essays in the ${displayName} category.`} />
+      </Helmet>
       <div className="container">
         <div style={{ textAlign: 'center', marginBottom: '2.5rem' }} className="animate-fade-in-up">
           <span className="category-label" style={{ marginBottom: '0.75rem' }}>{displayName}</span>
